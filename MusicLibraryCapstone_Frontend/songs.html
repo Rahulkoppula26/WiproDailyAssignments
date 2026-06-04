@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css" />
+  <title>Songs - Music Library</title>
+</head>
+
+<body>
+  <div class="wrapper">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <i class="fas fa-music"></i>
+        <h3>Music Library</h3>
+      </div>
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-item">
+          <a href="dashboard.html" class="sidebar-nav-link"><i class="fas fa-home"></i><span>Dashboard</span></a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="songs.html" class="sidebar-nav-link active"><i class="fas fa-music"></i><span>Songs</span></a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="playlists.html" class="sidebar-nav-link"><i class="fas fa-list"></i><span>Playlists</span></a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="profile.html" class="sidebar-nav-link"><i class="fas fa-user"></i><span>Profile</span></a>
+        </li>
+        <div class="sidebar-divider"></div>
+        <li class="sidebar-nav-item">
+          <a href="#" id="logoutBtn" class="sidebar-nav-link"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+        </li>
+      </ul>
+    </nav>
+    <!-- Main -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h4 class="mb-0">Songs</h4>
+        </div>
+        <div class="topbar-left">
+          <div class="search-box">
+            <i class="fas fa-search"></i><input id="globalSearch" placeholder="Search..." />
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="topbar-icon" onclick="showNotifications()">
+            <i class="fas fa-bell"></i><span class="notification-badge" id="notifBadge">0</span>
+          </button>
+          <div class="user-dropdown">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <span id="userName">User</span>
+          </div>
+        </div>
+      </header>
+      <div class="page-content">
+        <section class="hero-card">
+          <div>
+            <h1 class="hero-title">Songs Library</h1>
+            <p class="hero-subtitle">
+              All visible songs are shown as professional music cards instead
+              of a plain article-style page.
+            </p>
+          </div>
+          <div class="content-card">
+            <h5 id="songsCount">0 Songs</h5>
+            <p class="text-secondary mb-0">
+              Use search to filter by title, singer or album.
+            </p>
+          </div>
+        </section>
+        <!-- Songs -->
+        <div class="genre-bar">
+          <button class="genre-btn active" onclick="filterByGenre('ALL', this)">All</button>
+          <button class="genre-btn" onclick="filterByGenre('Romantic', this)">Romantic</button>
+          <button class="genre-btn" onclick="filterByGenre('Melody', this)">Melody</button>
+          <button class="genre-btn" onclick="filterByGenre('Dance', this)">Dance</button>
+          <button class="genre-btn" onclick="filterByGenre('Sad', this)">Sad</button>
+          <button class="genre-btn" onclick="filterByGenre('Item Song', this)">Item Song</button>
+        </div>
+        <div class="songs-grid" id="songsGrid"></div>
+        <div id="songsEmpty" class="empty-state hidden">
+          <i class="fas fa-music"></i>
+          <h3>No songs found</h3>
+          <p>No songs found that match your search criteria. </p>
+        </div>
+      </div>
+    </main>
+  </div>
+  <!-- Music Player -->
+  <div class="music-player" id="musicPlayer">
+    <div class="player-left">
+      <div class="player-thumb"><i class="fas fa-music"></i></div>
+      <div class="player-info">
+        <h4 id="currentSongTitle">No Song Playing</h4>
+        <p id="currentSongArtist">Select a song to play</p>
+      </div>
+    </div>
+    <div class="player-center">
+      <div class="player-controls">
+        <button onclick="alert('Shuffled')" id="shuffleBtn">
+          <i class="fas fa-random"></i>
+        </button>
+        <button onclick="alert('Repeated')" id="repeatBtn">
+          <i class="fas fa-redo"></i>
+        </button>
+        <button onclick="console.log('Previous')">
+          <i class="fas fa-step-backward"></i></button><button class="play-btn" onclick="togglePlay()"
+          id="playPauseBtn">
+          <i class="fas fa-play"></i></button><button onclick="console.log('Next')">
+          <i class="fas fa-step-forward"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Notifications -->
+  <div class="modal fade" id="notificationsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-bell me-2"></i>Notifications
+          </h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="notificationsList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Add to playlist -->
+  <div class="modal fade" id="addToPlaylistModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-list me-2"></i>Add to Playlist
+          </h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+
+
+<!-- Modal body -->
+        <div class="modal-body">
+          <p class="text-secondary mb-2" id="selectedSongName">
+            Selected Song
+          </p>
+
+          <label class="form-label">Choose Existing Playlist</label>
+          <select class="form-select mb-3" id="playlistSelect">
+            <option class="playlistDropdown" value="">Loading playlists...</option>
+          </select>
+
+          <div class="text-center text-secondary my-2">or</div>
+
+          <label class="form-label">Create New Playlist</label>
+          <input class="form-control" id="newPlaylistNameForSong" placeholder="Enter new playlist name" />
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Cancel
+          </button>
+          <button class="btn btn-primary" onclick="confirmAddToPlaylist()">
+            Add Song
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast text-bg-dark border-0">
+      <div class="toast-body" id="toastMessage"></div>
+    </div>
+  </div>
+
+
+
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    let isPlaying = false;
+    let currentSong = null;
+// 
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!requireUser()) return;
+      setupShell("User");
+      loadNotificationCount();
+      if (window.loadDashboardData) window.loadDashboardData();
+      if (typeof loadSongsPage === "function") loadSongsPage();
+      if (typeof loadPlaylistsPage === "function") loadPlaylistsPage();
+      if (typeof loadPlaylistDetails === "function") loadPlaylistDetails();
+      if (typeof loadProfile === "function") loadProfile();
+
+      document.getElementById("globalSearch")?.addEventListener("input", (e) => {
+        const q = e.target.value.trim();
+        if (window.filterSongs) filterSongs(q);
+        if (window.filterPlaylists) filterPlaylists(q);
+        if (window.searchDashboard) searchDashboard(q);
+      });
+    });
+// Helper function to render a song card with play and add to playlist options, 
+// using song data and handling click events for playing the song and opening the add to playlist modal
+    function songCard(song) {
+      console.log("Rendering song card for:", song);
+      const imageUrl =
+        song.imageUrl ||
+        song.image;
+
+      return `
+    <div class="song-card"
+         onclick='playSong(${JSON.stringify(song).replace(/'/g, "&#39;")})'>
+
+      <div class="song-image">
+        <img src="${song.songImageUrl || "placeholder.jpg"}"
+             alt="${escapeHtml(songTitle(song))}" />
+
+        <div class="play-overlay">
+          <i class="fas fa-play"></i>
+        </div>
+      </div>
+
+      <div class="song-info">
+        <h4>${escapeHtml(songTitle(song))}</h4>
+        <p>${escapeHtml(songSinger(song))}</p>
+        <p>${escapeHtml(songAlbum(song))}</p>
+        <button class="btn btn-primary btn-sm mt-2"
+          onclick='openAddToPlaylistModal(${JSON.stringify(song).replace(/'/g, "&#39;")})'>
+          <i class="fas fa-plus me-1"></i>Add to Playlist
+        </button>
+      </div>
+    </div>
+  `;
+    }
+// Helper function to render a playlist card with playlist data and handling click event to
+//  navigate to playlist details page
+    function playlistCard(p) {
+      return `<div class="playlist-card" onclick="location.href='playlist-details.html?id=${encodeURIComponent(p.id ?? p.playlistId ?? "")}'">
+          <div class="playlist-image"><i class="fas fa-list"></i></div>
+          <div class="playlist-info">
+            <h4>${escapeHtml(playlistName(p))}</h4>
+            <p>${(p.songs && p.songs.length) || 0} songs</p>
+            <div class="playlist-meta"><i class="fas fa-clock me-1"></i>${new Date().toLocaleDateString()}</div>
+          </div>
+        </div>`;
+    }
+    // Function to handle playing a song, which updates the current song information in 
+    // the music player UI and toggles the play/pause button state
+    function playSong(song) {
+      currentSong = song;
+      document.getElementById("currentSongTitle").textContent = songTitle(song);
+      document.getElementById("currentSongArtist").textContent = songSinger(song);
+      isPlaying = true;
+      document.getElementById("playPauseBtn").innerHTML = '<i class="fas fa-pause"></i>';
+    }
+// Function to toggle the play/pause state of the music player, which updates the play/pause
+//  button icon accordingly (note: this is a UI toggle and does not implement actual audio playback functionality)
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      document.getElementById("playPauseBtn").innerHTML = isPlaying
+        ? '<i class="fas fa-pause"></i>'
+        : '<i class="fas fa-play"></i>';
+    }
+// Helper function to render an empty state message when there are no songs available or
+//  if there's an error fetching data, which can be used to inform the user about the 
+// lack of content in a visually appealing way
+    function empty(msg) {
+      return `<div class="empty-state"><i class="fas fa-music"></i><h3>${msg}</h3><p>Your data will appear here once available from backend.</p></div>`;
+    }
+
+    let allSongs = [];
+    async function loadSongsPage() {
+      try {
+        allSongs = await getVisibleSongs();
+        renderSongs(allSongs);
+      } catch (e) {
+        console.error(e);
+        renderSongs([]);
+      }
+    }
+
+    function renderSongs(songs) {
+      document.getElementById("songsCount").textContent = `${songs.length} Songs`;
+      document.getElementById("songsGrid").innerHTML = songs.map(songCard).join("");
+      document.getElementById("songsEmpty").classList.toggle("hidden", songs.length > 0);
+    }
+
+    function filterSongs(q) {
+      const s = q.toLowerCase();
+      const filtered = !s ? allSongs : allSongs.filter((song) =>
+        `${songTitle(song)} ${songSinger(song)} ${songAlbum(song)} ${song.musicDirector || ""} ${song.genre || ""}`.toLowerCase().includes(s)
+      );
+      renderSongs(filtered);
+
+    }
+
+
+// Add to playlist modal logic: This includes functions to open the modal with the selected
+//  song's information, load the user's playlists into a dropdown, and handle the confirmation 
+// of adding the song to either an existing playlist or a newly created playlist, with appropriate
+//  error handling and user feedback.
+
+    let selectedSongForPlaylist = null;
+    let userPlaylistsForModal = [];
+
+    async function openAddToPlaylistModal(song) {
+      selectedSongForPlaylist = song;
+
+      document.getElementById("selectedSongName").textContent =
+        `Selected: ${songTitle(song)}`;
+
+      document.getElementById("newPlaylistNameForSong").value = "";
+
+      const select = document.getElementById("playlistSelect");
+      select.innerHTML = `<option class="playlistDropdown" value="">Loading playlists...</option>`;
+
+      try {
+        userPlaylistsForModal = await getMyPlaylists();
+
+        select.innerHTML =
+          `<option class="playlistDropdown" value="">Select playlist</option>` +
+          userPlaylistsForModal
+            .map(
+              p => `<option value="${p.id}">${escapeHtml(playlistName(p))}</option>`
+            )
+            .join("");
+
+      } catch (e) {
+        console.error(e);
+        select.innerHTML = `<option class="playlistDropdown" value="">Unable to load playlists</option>`;
+      }
+
+      new bootstrap.Modal(
+        document.getElementById("addToPlaylistModal")
+      ).show();
+    }
+
+    // Function to handle the confirmation of adding a song to a playlist, which checks 
+    // if the user has selected an existing playlist or entered a new playlist name,
+    //  creates a new playlist if needed, and then adds the song to the appropriate playlist 
+    // with error handling and user feedback through alerts.
+    async function confirmAddToPlaylist() {
+      if (!selectedSongForPlaylist) return;
+
+      const selectedPlaylistId = document.getElementById("playlistSelect").value;
+      const newPlaylistName = document.getElementById("newPlaylistNameForSong").value.trim();
+
+      try {
+        let playlistId = selectedPlaylistId;
+
+        if (!playlistId && newPlaylistName) {
+          const createdPlaylist = await createUserPlaylist(newPlaylistName);
+          playlistId = createdPlaylist.id;
+        }
+
+        if (!playlistId) {
+          alert("Please select existing playlist or create a new playlist.");
+          return;
+        }
+
+        await addSongToPlaylist(playlistId, selectedSongForPlaylist.id);
+
+        bootstrap.Modal.getInstance(
+          document.getElementById("addToPlaylistModal")
+        )?.hide();
+
+        alert("Song added to playlist successfully!");
+
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+    
+// Function to filter songs by genre when a genre button is clicked, which updates 
+// the active state of the buttons and renders the filtered list of songs based on 
+// the selected genre, or shows all songs if "All" is selected.
+    function filterByGenre(genre, button) {
+      document.querySelectorAll(".genre-btn").forEach(btn => {
+        btn.classList.remove("active");
+      });
+
+      button.classList.add("active");
+
+      if (genre === "ALL") {
+        renderSongs(allSongs);
+        return;
+      }
+
+      const filteredSongs = allSongs.filter(song =>
+        String(song.genre || "").toLowerCase() === genre.toLowerCase()
+      );
+
+      renderSongs(filteredSongs);
+    }
+    
+
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <title>Admin Users - Music Library</title>
+</head>
+
+<body>
+    <div class="wrapper admin-theme">
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-music"></i>
+                <h3>Music Library</h3>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="admin-dashboard.html" class="sidebar-nav-link">
+                        <i class="fas fa-home"></i><span>Admin Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="admin-songs.html" class="sidebar-nav-link">
+                        <i class="fas fa-music"></i><span>Songs</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="admin-users.html" class="sidebar-nav-link active">
+                        <i class="fas fa-users"></i><span>All Users</span>
+                    </a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="admin-profile.html" class="sidebar-nav-link">
+                        <i class="fas fa-user"></i><span>Admin Profile</span>
+                    </a>
+                </li>
+                <div class="sidebar-divider"></div>
+                <li class="sidebar-nav-item">
+                    <a href="#" id="logoutBtn" class="sidebar-nav-link">
+                        <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h4 class="mb-0">Admin Users</h4>
+                </div>
+                <div class="topbar-left">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input id="globalSearch" placeholder="Search users..." />
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button class="topbar-icon" onclick="showNotifications()">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge" id="notifBadge">0</span>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-avatar" id="userAvatar">U</div>
+                        <span id="userName">Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="section-header">
+                    <h5>All Users</h5>
+                </div>
+
+                <div class="content-card mb-4">
+                    <div class="table-responsive">
+                        <table class="table-darkish">
+                            <thead>
+                                <tr>
+                                    <td>Id</td>
+                                    <td>Username</td>
+                                    <td>Email</td>
+                                    <td>Phone</td>
+                                    <td>Action</td>
+                                </tr>
+                            </thead>
+                            <tbody id="adminUsersTable">
+                                <tr>
+                                    <td colspan="5">Loading users...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+<!--    Music Player -->
+    <div class="music-player" id="musicPlayer">
+        <div class="player-left">
+            <div class="player-thumb"><i class="fas fa-music"></i></div>
+            <div class="player-info">
+                <h4 id="currentSongTitle">No Song Playing</h4>
+                <p id="currentSongArtist">Select a song to play</p>
+            </div>
+        </div>
+        <!-- Player Controls -->
+        <div class="player-center">
+            <div class="player-controls">
+                <button onclick="alert('Shuffled')" id="shuffleBtn">
+                    <i class="fas fa-random"></i>
+                </button>
+                <button onclick="alert('Repeated')" id="repeatBtn">
+                    <i class="fas fa-redo"></i>
+                </button>
+                <button onclick="console.log('Previous')">
+                    <i class="fas fa-step-backward"></i>
+                </button>
+                <button class="play-btn" onclick="togglePlay()" id="playPauseBtn">
+                    <i class="fas fa-play"></i>
+                </button>
+                <button onclick="console.log('Next')">
+                    <i class="fas fa-step-forward"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+<!--    Modals -->
+    <div class="modal fade" id="notificationsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-bell me-2"></i>Notifications
+                    </h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="notificationsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast text-bg-dark border-0">
+            <div class="toast-body" id="toastMessage"></div>
+        </div>
+    </div>
+
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        let adminUsersCache = [];
+        let isPlaying = false;
+        let currentSong = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!requireAdmin()) return;
+            setupShell("Admin");
+
+            loadUsersData();
+
+            document
+                .getElementById("globalSearch")
+                ?.addEventListener("input", (e) => {
+                    const q = e.target.value.trim().toLowerCase();
+                    if (!q) return renderUsers(adminUsersCache);
+                    const filtered = adminUsersCache.filter((u) => {
+                        const id = String(u.id ?? u.userId ?? "");
+                        const username = String(u.username ?? "");
+                        const email = String(u.email ?? "");
+                        const role = String(u.role ?? "");
+                        return `${id} ${username} ${email} ${role}`.toLowerCase().includes(q);
+                    });
+                    renderUsers(filtered);
+                });
+        });
+// Function to load the users data for the admin users page, which fetches the list of all users using the getAllUsersAdmin function and renders them in the table. If there's an error while loading the users, it displays an error message in the table.
+        async function loadUsersData() {
+            const tbody = document.getElementById("adminUsersTable");
+            if (!tbody) return;
+
+            tbody.innerHTML = '<tr><td colspan="5">Loading users...</td></tr>';
+
+            try {
+                const users = await getAllUsersAdmin();
+                adminUsersCache = users;
+                renderUsers(users);
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = `<tr><td colspan="5">Unable to load users</td></tr>`;
+            }
+        }
+// Function to render the list of users in the table, filtering out users without phone numbers and emails. It maps each user to a table row with their details and a delete button, and if there are no users to display, it shows a message indicating that no users were found.
+        function renderUsers(users) {
+            const tbody = document.getElementById("adminUsersTable");
+            if (!tbody) return;
+            const onlyUsers = users.filter(user => (user.phone !== null && user.email !== null)); // Exclude admin user from the list
+            console.log("Rendering users:", onlyUsers);
+
+
+            tbody.innerHTML =
+                onlyUsers
+                    .map(
+                        (user) => `
+              <tr>
+                <td>${escapeHtml(user.id ?? user.userId ?? "-")}</td>
+                <td>${escapeHtml(user.username ?? "-")}</td>
+                <td>${escapeHtml(user.email || "-")}</td>
+                <td>${escapeHtml(user.phone || "-")}</td>
+                <td>
+                  <button class="btn btn-sm btn-danger" onclick="deleteUser(${escapeHtml(
+                            String(user.id ?? user.userId)
+                        )})">
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            `,
+                    )
+                    .join("") ||
+                `<tr><td colspan="5">No users found</td></tr>`;
+        }
+// Function to delete a user from the database using the deleteUserAdmin function and reload the users data. If there's an error while deleting the user, it displays an alert message.
+        async function deleteUser(id) {
+            if (!id && id !== 0) return;
+            if (!confirm("Are you sure you want to delete this user?")) return;
+
+            try {
+                await deleteUserAdmin(id);
+                await loadUsersData();
+            } catch (e) {
+                alert(e.message);
+            }
+        }
+// Function to toggle the play/pause state of the audio player and update the button icon accordingly. When the play/pause button is clicked, it toggles the isPlaying variable and changes the inner HTML of the button to show either a play or pause icon based on the current state.
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            document.getElementById("playPauseBtn").innerHTML =
+                isPlaying
+                    ? '<i class="fas fa-pause"></i>'
+                    : '<i class="fas fa-play"></i>';
+        }
+    </script>
+</body>
+
+</html>

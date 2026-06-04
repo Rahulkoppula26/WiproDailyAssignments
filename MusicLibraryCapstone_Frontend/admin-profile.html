@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="styles/main.css" />
+    <title>Admin Profile - Music Library</title>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="wrapper admin-theme">
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-music"></i>
+                <h3>Music Library</h3>
+            </div>
+            <ul class="sidebar-nav">
+                <li class="sidebar-nav-item">
+                    <a href="admin-dashboard.html" class="sidebar-nav-link"><i class="fas fa-home"></i><span>Admin
+                            Dashboard</span></a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="admin-songs.html" class="sidebar-nav-link"><i class="fas fa-music"></i><span>Songs
+                        </span></a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="admin-users.html" class="sidebar-nav-link"><i class="fas fa-users"></i><span>All
+                            Users</span></a>
+                </li>
+                <li class="sidebar-nav-item">
+                    <a href="admin-profile.html" class="sidebar-nav-link active"><i class="fas fa-user"></i><span>Admin
+                            Profile</span></a>
+                </li>
+                <div class="sidebar-divider"></div>
+                <li class="sidebar-nav-item">
+                    <a href="#" id="logoutBtn" class="sidebar-nav-link"><i
+                            class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+                </li>
+            </ul>
+        </nav>
+<!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h4 class="mb-0">Admin Profile</h4>
+                </div>
+                <div class="topbar-left">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input id="globalSearch" placeholder="Search..." />
+                    </div>
+                </div>
+                <div class="topbar-right">
+                    <button class="topbar-icon" onclick="showNotifications()">
+                        <i class="fas fa-bell"></i><span class="notification-badge" id="notifBadge">0</span>
+                    </button>
+                    <div class="user-dropdown">
+                        <div class="user-avatar" id="userAvatar">A</div>
+                        <span id="userName">Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <section class="hero-card">
+                    <div>
+                        <h1 class="hero-title">Admin Profile</h1>
+                        <p class="hero-subtitle">
+                            Admin account details and admin-side content statistics.
+                        </p>
+                    </div>
+                </section>
+
+                <div class="profile-grid">
+                    <div class="profile-card">
+                        <div class="profile-avatar-lg" id="profileAvatar">A</div>
+                        <h3 id="profileName">Admin</h3>
+                        <p class="text-secondary mb-0" id="profileRole">ROLE_ADMIN</p>
+                    </div>
+
+                    <div class="profile-card">
+                        <h5 class="mb-3">Account Information</h5>
+                        <table class="table-darkish">
+                            <tbody id="profileTable">
+                                <tr>
+                                    <td>Status</td>
+                                    <td>Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="profile-grid mt-4">
+                    <div class="profile-card">
+                        <h5 class="mb-3">Admin Statistics</h5>
+                        <table class="table-darkish">
+                            <tbody id="adminStatsTable">
+                                <tr>
+                                    <td>Total Songs (Admin)</td>
+                                    <td>Loading...</td>
+                                </tr>
+                                <tr>
+                                    <td>Visible Songs</td>
+                                    <td>Loading...</td>
+                                </tr>
+                                <tr>
+                                    <td>Hidden Songs</td>
+                                    <td>Loading...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="profile-card">
+                        <h5 class="mb-3">Quick Actions</h5>
+                        <div class="d-grid gap-2">
+                            <a class="btn btn-primary" href="admin-songs.html"><i class="fas fa-music me-2"></i>Manage
+                                Songs</a>
+                            <a class="btn btn-outline-secondary" href="admin-dashboard.html"><i
+                                    class="fas fa-chart-line me-2"></i>Back to Dashboard</a>
+                        </div>
+                        <div class="mt-3 text-secondary small">
+                            Stats are derived from admin song data returned by the backend and visibility flags.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+<!--    Music Player -->
+    <div class="music-player" id="musicPlayer">
+        <div class="player-left">
+            <div class="player-thumb"><i class="fas fa-music"></i></div>
+            <div class="player-info">
+                <h4 id="currentSongTitle">No Song Playing</h4>
+                <p id="currentSongArtist">Select a song to play</p>
+            </div>
+        </div>
+        <div class="player-center">
+            <div class="player-controls">
+                <button onclick="alert('Shuffled')" id="shuffleBtn">
+                    <i class="fas fa-random"></i>
+                </button>
+                <button onclick="alert('Repeated')" id="repeatBtn">
+                    <i class="fas fa-redo"></i>
+                </button>
+                <button onclick="console.log('Previous')">
+                    <i class="fas fa-step-backward"></i></button><button class="play-btn" onclick="togglePlay()"
+                    id="playPauseBtn">
+                    <i class="fas fa-play"></i></button><button onclick="console.log('Next')">
+                    <i class="fas fa-step-forward"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+<!-- Notifications Modal -->
+    <div class="modal fade" id="notificationsModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-bell me-2"></i>Notifications
+                    </h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="notificationsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast text-bg-dark border-0">
+            <div class="toast-body" id="toastMessage"></div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/api.js"></script>
+
+    <script>
+        let isPlaying = false;
+        let currentSong = null;
+
+        function safeText(v) {
+            return String(v ?? "");
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (!requireAdmin()) return;
+            setupShell("Admin");
+            loadAdminProfile();
+            loadAdminStats();
+
+            document.getElementById("globalSearch")?.addEventListener("input", (e) => {
+               
+            });
+        });
+// Function to load admin profile data from the backend and populate the profile page with the retrieved data
+//  including error handling to log any issues that occur during the fetch process.
+        async function loadAdminProfile() {
+            const name = localStorage.getItem("username") || "Admin";
+            const role = localStorage.getItem("user_role") || "ROLE_ADMIN";
+
+            document.getElementById("profileName").textContent = name;
+            document.getElementById("profileAvatar").textContent = (name || "A")[0].toUpperCase();
+            document.getElementById("profileRole").textContent = role;
+
+            document.getElementById("profileTable").innerHTML = `
+        <tr><td>Username</td><td>${escapeHtml(name)}</td></tr>
+        <tr><td>Role</td><td>${escapeHtml(role)}</td></tr>
+        <tr><td>Admin Id</td><td>${escapeHtml(getUserId() || "Not returned from login API")}</td></tr>
+      `;
+        }
+// Function to load admin statistics from the backend and populate the profile page with the retrieved data,
+//  including error handling to log any issues that occur during the fetch process.
+        async function loadAdminStats() {
+            const tbody = document.getElementById("adminStatsTable");
+            if (!tbody) return;
+
+            tbody.innerHTML = `
+        <tr><td>Total Songs (Admin)</td><td>Loading...</td></tr>
+        <tr><td>Visible Songs</td><td>Loading...</td></tr>
+        <tr><td>Hidden Songs</td><td>Loading...</td></tr>
+      `;
+
+            try {
+                const songs = await getAllSongsAdmin();
+                const total = Array.isArray(songs) ? songs.length : 0;
+                const visible = Array.isArray(songs) ? songs.filter(songVisible).length : 0;
+                const hidden = total - visible;
+
+                tbody.innerHTML = `
+          <tr><td>Total Songs (Admin)</td><td>${escapeHtml(total)}</td></tr>
+          <tr><td>Visible Songs</td><td>${escapeHtml(visible)}</td></tr>
+          <tr><td>Hidden Songs</td><td>${escapeHtml(hidden)}</td></tr>
+        `;
+            } catch (e) {
+                console.error(e);
+                tbody.innerHTML = `
+          <tr><td>Total Songs (Admin)</td><td>Unavailable</td></tr>
+          <tr><td>Visible Songs</td><td>Unavailable</td></tr>
+          <tr><td>Hidden Songs</td><td>Unavailable</td></tr>
+        `;
+            }
+        }
+
+        // togglePlay function to toggle the play/pause state of the music player.
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            document.getElementById("playPauseBtn").innerHTML = isPlaying
+                ? '<i class="fas fa-pause"></i>'
+                : '<i class="fas fa-play"></i>';
+        }
+    </script>
+</body>
+
+</html>

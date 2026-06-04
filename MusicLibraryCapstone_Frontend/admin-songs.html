@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Songs CRUD</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+  <style>
+    .song-admin-row {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .toggle-switch {
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper admin-theme">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <i class="fas fa-music"></i>
+        <h3>Music Library</h3>
+      </div>
+      <ul class="sidebar-nav">
+
+        <li class="sidebar-nav-item">
+          <a href="admin-dashboard.html" class="sidebar-nav-link">
+            <i class="fas fa-music"></i>
+            <span>Admin Dashboard</span>
+          </a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="admin-songs.html" class="sidebar-nav-link active">
+            <i class="fas fa-music"></i>
+            <span>Songs</span>
+          </a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="admin-users.html" class="sidebar-nav-link"><i class="fas fa-users"></i><span>All Users</span></a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="admin-profile.html" class="sidebar-nav-link">
+            <i class="fas fa-user"></i>
+            <span>Admin Profile</span>
+          </a>
+        </li>
+
+        <div class="sidebar-divider"></div>
+        <li class="sidebar-nav-item">
+          <a href="#" id="logoutBtn" class="sidebar-nav-link">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="main-content">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h4 class="mb-0">Admin Songs Management</h4>
+        </div>
+        <div class="topbar-left">
+          <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search songs..." id="globalSearch">
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="topbar-icon" onclick="showNotifications()">
+            <i class="fas fa-bell"></i>
+            <span class="notification-badge" id="notifBadge">0</span>
+          </button>
+          <div class="user-dropdown" id="userDropdown">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <span id="userName">Admin</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-content">
+        <div class="">
+          <div id="songsError" class="alert alert-danger mt-3" style="display:none;" role="alert"></div> 
+          <div class="main-card-body">
+            <div class="card" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);">
+              <div class="card-body" id="redirectToForm">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Create / Update Song</h5>
+                  <span id="modeBadge" class="badge text-bg-primary">Create</span>
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label">Name / Title</label>
+                  <input class="form-control" id="songName" placeholder="Song name" required />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Singer / Artist</label>
+                  <input class="form-control" id="songSinger" placeholder="Singer / Artist" required />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Music Director</label>
+                  <input class="form-control" id="songMusicDirector" placeholder="Music director" required />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Album</label>
+                  <input class="form-control" id="songAlbum" placeholder="Album" required />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Release Year</label>
+                  <input class="form-control" id="songReleaseYear" type="number" min="1900" max="2030" placeholder="e.g. 2024" />
+                </div>
+
+                <div class="mb-3">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <label class="form-label mb-0">Visible to users</label>
+                    <div class="form-check form-switch m-0">
+                      <input class="form-check-input" type="checkbox" id="songVisibleToggle" checked />
+                      <label class="form-check-label" for="songVisibleToggle">{True/False}</label>
+                    </div>
+                  </div>
+                  <small class="text-muted">When enabled, users can see the song. When disabled, song remains
+                    hidden.</small>
+                </div>
+
+                <input type="hidden" id="editingSongId" value="" />
+
+                <div class="d-grid gap-2">
+                  <button class="btn btn-primary" id="saveSongBtn" onclick="onSaveSong()">
+                    <i class="fas fa-floppy-disk me-2"></i>Save Song
+                  </button>
+                  <button class="btn btn-outline-secondary" onclick="resetForm()">
+                    Cancel Edit
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="mb-0"><i class="fas fa-list me-2"></i>Song List</h5>
+              <button class="btn btn-sm btn-outline-primary" onclick="loadSongs()">
+                <i class="fas fa-rotate me-2"></i>Refresh
+              </button>
+            </div>
+
+            <div id="songsList" class="songs-grid"></div>
+            <div id="songsEmpty" class="text-center text-muted mt-4" style="display:none;">
+              <i class="fas fa-music fa-2x mb-2"></i>
+              <div>No songs found.</div>
+            </div>
+
+           
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications Modal -->
+  <div class="modal fade" id="notificationsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="fas fa-bell me-2"></i>Notifications</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+        </div>
+        <div class="modal-body">
+          <div class="notifications-list" id="notificationsList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast text-bg-dark border-0">
+      <div class="toast-body" id="toastMessage"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    // Base URL for admin song CRUD operations
+    const ADMIN_CRUD_BASE = ADMIN_SONGS_URL;
+    let debounceTimer = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!requireAdmin()) return;
+      setupShell('Admin');
+
+      const toggle = document.getElementById('songVisibleToggle');
+      const toggleLabel = toggle?.closest('.form-check')?.querySelector('.form-check-label');
+      if (toggle && toggleLabel) {
+        const updateLabel = () => { toggleLabel.textContent = toggle.checked ? 'True' : 'False'; };
+        updateLabel();
+        toggle.addEventListener('change', updateLabel);
+      }
+
+      document.getElementById('globalSearch')?.addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          const q = e.target.value.trim();
+          if (!q) loadSongs(); else searchSongs(q);
+        }, 100);
+      });
+
+      loadSongs();
+    });
+// formToSongPayload function to construct the payload for creating or updating a song based on the form inputs. It collects values from the form fields, formats the release date if only a year is provided, and constructs an object with the song details. It also removes any empty or undefined fields from the payload before returning it.
+    function formToSongPayload() {
+      const yearValue = document.getElementById('songReleaseYear').value.trim();
+      const releaseDate = yearValue.length === 4 ? `${yearValue}-01-01` : yearValue;
+      const payload = {
+        songName: document.getElementById('songName').value.trim(),
+        artistSinger: document.getElementById('songSinger').value.trim(),
+        musicDirector: document.getElementById('songMusicDirector').value.trim(),
+        albumMovieName: document.getElementById('songAlbum').value.trim(),
+        releaseDate: releaseDate || null,
+        visibility: document.getElementById('songVisibleToggle').checked,
+        songImageUrl: '',
+        songDuration: '',
+        genre: ''
+      };
+      Object.keys(payload).forEach(k => {
+        if (payload[k] === '' || payload[k] === undefined) delete payload[k];
+      });
+      return payload;
+    }
+// loadSongs function to fetch all songs from the server and render them in the UI. It handles errors and updates the UI accordingly.
+    async function loadSongs() {
+      hideError();
+      try {
+        const songs = await getAllSongsAdmin();
+        renderSongs(songs);
+      } catch (err) {
+        showError(err.message || 'Error loading songs');
+      }
+    }
+// searchSongs function to filter songs based on a search query. It fetches all songs and filters
+//  them by checking if the query matches any of the song's attributes (title, singer, album, music
+//  director, genre). The filtered list is then rendered in the UI.
+    async function searchSongs(query) {
+      hideError();
+      try {
+        const songs = await getAllSongsAdmin();
+        const q = query.toLowerCase();
+        const filtered = songs.filter(s =>
+          `${songTitle(s)} ${songSinger(s)} ${songAlbum(s)} ${s.musicDirector || ''} ${s.genre || ''}`.toLowerCase().includes(q)
+        );
+        renderSongs(filtered);
+      } catch (err) {
+        showError(err.message || 'Error searching songs');
+      }
+    }
+//  renderSongs function to render the list of songs in the UI. It takes an array of songs
+//  as input and generates HTML for each song card. It also handles the case when there are 
+// no songs to display. Each song card includes the song's image, title, singer, album, release date,
+//  visibility toggle, and buttons for editing and deleting the song. The function updates the UI based 
+// on the provided songs data.
+    function renderSongs(songs) {
+      const list = document.getElementById('songsList');
+      const empty = document.getElementById('songsEmpty');
+      list.innerHTML = '';
+
+      if (!songs || songs.length === 0) {
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      songs.forEach(song => {
+        const id = song.id ?? song.songId ?? song._id;
+        const visible = songVisible(song);
+
+        const card = document.createElement('div');
+        card.className = 'song-card';
+        card.innerHTML = `
+          <div class="song-image">
+           <img src="${song.songImageUrl || "placeholder.jpg"}"
+             alt="${escapeHtml(songTitle(song))}" />
+          </div>
+          <div class="song-info d-flex flex-column gap-2">
+            <div>
+              <h4>${escapeHtml(songTitle(song))}</h4>
+              <p>${escapeHtml(songSinger(song))} • ${escapeHtml(songAlbum(song))}</p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small">Visibility</span>
+                <div class="form-check form-switch toggle-switch m-0">
+                  <input class="form-check-input" type="checkbox" ${visible ? 'checked' : ''} id="vis-${escapeHtml(String(id))}" onchange="onToggleVisibility(${JSON.stringify(id)})" />
+                  <label class="form-check-label">${visible ? 'Visible' : 'Visible'}</label>
+                </div>
+              </div>
+              <div class="text-muted small ms-2">Release: ${escapeHtml(String(song.releaseDate || 'N/A'))}</div>
+            </div>
+
+            <div class="d-flex gap-2 mt-2">
+              <button  class="btn btn-sm btn-outline-primary flex-grow-1" onclick="onEditSong(${JSON.stringify(id)})"><a href="#redirectToForm" class="text-decoration-none text-reset">
+                <i class="fas fa-pen me-1"></i>Edit
+              </a>
+              </button>
+              <button class="btn btn-sm btn-outline-danger flex-grow-1" onclick="onDeleteSong(${JSON.stringify(id)})">
+                <i class="fas fa-trash me-1"></i>Delete
+              </button>
+            </div>
+
+            <div class="text-muted small">ID: <span class="mono">${escapeHtml(String(id || ''))}</span></div>
+          </div>
+        `;
+
+        list.appendChild(card);
+      });
+    }
+
+//  onToggleVisibility function to toggle the visibility of a song.
+//  It sends a PUT request to the server to update the song's visibility.
+    async function onToggleVisibility(id) {
+      if (id === undefined || id === null || id === '') return;
+      const checkbox = document.getElementById(`vis-${String(id)}`);
+      try {
+        const song = await apiFetch(`${ADMIN_CRUD_BASE}/${id}`, { headers: authHeaders() });
+        song.visibility = checkbox?.checked;
+        await apiFetch(`${ADMIN_CRUD_BASE}/${id}`, {
+          method: 'PUT',
+          headers: jsonHeaders(),
+          body: JSON.stringify(song)
+        });
+        await loadSongs();
+      } catch (err) {
+        showError(err.message || 'Error toggling visibility');
+        await loadSongs();
+      }
+    }
+//  onDeleteSong function to delete a song from the server.
+    async function onDeleteSong(id) {
+      if (id === undefined || id === null || id === '') return;
+      if (!confirm('Delete this song? This cannot be undone.')) return;
+      try {
+        await apiFetch(`${ADMIN_CRUD_BASE}/${id}`, { method: 'DELETE', headers: authHeaders() });
+        showToast('Song deleted', 'success');
+        resetForm();
+        await loadSongs();
+      } catch (err) {
+        showError(err.message || 'Error deleting song');
+      }
+    }
+// onEditSong function to load a song's details into the form for editing.
+//  It fetches the song data from the server and populates the form fields with the song's information.
+//  If there's an error while loading the song, it displays an error message.
+    async function onEditSong(id) {
+      if (id === undefined || id === null || id === '') return;
+      hideError();
+      try {
+        const song = await apiFetch(`${ADMIN_CRUD_BASE}/${id}`, { headers: authHeaders() });
+        document.getElementById('modeBadge').textContent = 'Update';
+        document.getElementById('editingSongId').value = id;
+        document.getElementById('songName').value = songTitle(song) === 'Unknown Song' ? '' : songTitle(song);
+        document.getElementById('songSinger').value = songSinger(song) === 'Unknown Artist' ? '' : songSinger(song);
+        document.getElementById('songMusicDirector').value = song.musicDirector || '';
+        document.getElementById('songAlbum').value = songAlbum(song) === 'Music Library' ? '' : songAlbum(song);
+        document.getElementById('songReleaseYear').value = song.releaseDate || '';
+        document.getElementById('songVisibleToggle').checked = songVisible(song);
+      } catch (err) {
+        showError(err.message || 'Error loading song');
+      }
+    }
+// onSaveSong function to save a song to the server.
+//  It fetches the song details from the form and sends a POST or 
+// PUT request to the server to create or update the song.
+    async function onSaveSong() {
+      hideError();
+      const id = document.getElementById('editingSongId').value;
+      const payload = formToSongPayload();
+      if (!payload.songName) {
+        showError('Song name/title is required');
+        return;
+      }
+      try {
+        const isUpdate = !!id;
+        await apiFetch(isUpdate ? `${ADMIN_CRUD_BASE}/${id}` : ADMIN_CRUD_BASE, {
+          method: isUpdate ? 'PUT' : 'POST',
+          headers: jsonHeaders(),
+          body: JSON.stringify(payload)
+        });
+        if (!isUpdate) {
+          await NotificationsAPI.send('New Song Added', `A new song "${payload.songName}" was added by admin.`);
+        }
+        showToast(isUpdate ? 'Song updated' : 'Song created', 'success');
+        resetForm();
+        await loadSongs();
+      } catch (err) {
+        showError(err.message || 'Error saving song');
+      }
+    }
+// resetForm function to reset the song form to its default state.
+//  It clears all form fields, resets the mode badge to "Create", and sets the visibility toggle to true.
+    function resetForm() {
+      document.getElementById('modeBadge').textContent = 'Create';
+      document.getElementById('editingSongId').value = '';
+      document.getElementById('songName').value = '';
+      document.getElementById('songSinger').value = '';
+      document.getElementById('songMusicDirector').value = '';
+      document.getElementById('songAlbum').value = '';
+      document.getElementById('songReleaseYear').value = '';
+      document.getElementById('songVisibleToggle').checked = true;
+    }
+// hideError and showError functions to manage the display of error messages in the UI.
+//  hideError hides the error message element and clears its content, while showError sets 
+// the error message text and makes the element visible.
+    function hideError() {
+      const el = document.getElementById('songsError');
+      if (el) { el.style.display = 'none'; el.textContent = ''; }
+    }
+
+    
+//  showError function to display an error message in the UI.
+    function showError(msg) {
+      setTimeout(() => {
+        hideError();
+      }, 3000);
+      const el = document.getElementById('songsError');
+      if (el) { el.textContent = msg; el.style.display = 'block'; }
+    }
+//  showToast function to display a toast message in the UI.
+    function showToast(msg, type = 'success') {
+      alert(msg);
+    }
+  </script>
+</body>
+
+</html>

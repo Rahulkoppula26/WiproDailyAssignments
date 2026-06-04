@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css" />
+  <title>Admin Dashboard - Music Library</title>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <div class="wrapper admin-theme">
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <i class="fas fa-music"></i>
+        <h3>Music Library</h3>
+      </div>
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-item">
+          <a href="admin-dashboard.html" class="sidebar-nav-link active"><i class="fas fa-home"></i><span>Admin
+              Dashboard</span></a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="admin-songs.html" class="sidebar-nav-link"><i class="fas fa-music"></i><span>Songs</span></a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="admin-users.html" class="sidebar-nav-link"><i class="fas fa-users"></i><span>All Users</span></a>
+        </li>
+        <li class="sidebar-nav-item">
+          <a href="admin-profile.html" class="sidebar-nav-link"><i class="fas fa-user"></i><span>Admin
+              Profile</span></a>
+        </li>
+        <div class="sidebar-divider"></div>
+        <li class="sidebar-nav-item">
+          <a href="#" id="logoutBtn" class="sidebar-nav-link"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a>
+        </li>
+      </ul>
+    </nav>
+    <!-- Main -->
+    <main class="main-content">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-toggle" id="menuToggle">
+            <i class="fas fa-bars"></i>
+          </button>
+          <h4 class="mb-0">Admin Dashboard</h4>
+        </div>
+        <div class="topbar-left">
+          <div class="search-box">
+            <i class="fas fa-search"></i><input id="globalSearch" placeholder="Search..." />
+          </div>
+        </div>
+        <div class="topbar-right">
+          <button class="topbar-icon" onclick="showNotifications()">
+            <i class="fas fa-bell"></i><span class="notification-badge" id="notifBadge">0</span>
+          </button>
+          <div class="user-dropdown">
+            <div class="user-avatar" id="userAvatar">U</div>
+            <span id="userName">Admin</span>
+          </div>
+        </div>
+      </header>
+      <div class="page-content">
+        <section class="hero-card">
+          <div>
+            <h1 class="hero-title">Admin Control Center</h1>
+            <p class="hero-subtitle">
+              Manage songs, visibility and notifications from a separate admin
+              dashboard.
+            </p>
+            <div class="hero-actions">
+              <a href="admin-songs.html" class="btn btn-primary"><i class="fas fa-music me-2"></i>Manage Songs</a>
+            </div>
+          </div>
+          <div class="content-card">
+            <h5>Admin Mode</h5>
+            <p class="text-secondary mb-0">
+              User dashboard stays separate from admin tools.
+            </p>
+          </div>
+        </section>
+        <!-- Stats -->
+        <div class="stats-grid">
+
+          <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-music"></i></div>
+            <div class="stat-info">
+              <h3 id="adminSongs">0</h3>
+              <p>Total Songs</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon success"><i class="fas fa-eye"></i></div>
+            <div class="stat-info">
+              <h3 id="visibleSongs">0</h3>
+              <p>Visible Songs</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon warning">
+              <i class="fas fa-eye-slash"></i>
+            </div>
+            <div class="stat-info">
+              <h3 id="hiddenSongs">0</h3>
+              <p>Hidden Songs</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon danger"><i class="fas fa-bell"></i></div>
+            <div class="stat-info">
+              <h3>Live</h3>
+              <p>Notifications</p>
+            </div>
+          </div>
+        </div>
+        <div class="section-header">
+          <h5>Recent Songs</h5>
+        </div>
+        <div class="songs-grid" id="adminRecentSongs"></div>
+      </div>
+    </main>
+  </div>
+  <!-- Music Player -->
+  <div class="music-player" id="musicPlayer">
+    <div class="player-left">
+      <div class="player-thumb"><i class="fas fa-music"></i></div>
+      <div class="player-info">
+        <h4 id="currentSongTitle">No Song Playing</h4>
+        <p id="currentSongArtist">Select a song to play</p>
+      </div>
+    </div>
+    <div class="player-center">
+      <div class="player-controls">
+        <button onclick="alert('Shuffled')" id="shuffleBtn">
+          <i class="fas fa-random"></i>
+        </button>
+        <button onclick="alert('Repeated')" id="repeatBtn">
+          <i class="fas fa-redo"></i>
+        </button>
+        <button onclick="console.log('Previous')">
+          <i class="fas fa-step-backward"></i></button><button class="play-btn" onclick="togglePlay()"
+          id="playPauseBtn">
+          <i class="fas fa-play"></i></button><button onclick="console.log('Next')">
+          <i class="fas fa-step-forward"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Notifications -->
+  <div class="modal fade" id="notificationsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-bell me-2"></i>Notifications
+          </h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="notificationsList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Toast Container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="liveToast" class="toast text-bg-dark border-0">
+      <div class="toast-body" id="toastMessage"></div>
+    </div>
+  </div>
+
+
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    let isPlaying = false;
+    let currentSong = null;
+
+    document.addEventListener("DOMContentLoaded", () => {
+      if (!requireAdmin()) return;
+      setupShell("Admin");
+      loadDashboardData();
+      document.getElementById("globalSearch")?.addEventListener("input", (e) => searchDashboard(e.target.value.trim()));
+    });
+// Helper to create song card HTML with proper escaping and click handler
+    function songCard(song) {
+      console.log("Rendering song card for:", song);
+
+      return `
+    <div class="song-card"
+         onclick='playSong(${JSON.stringify(song).replace(/'/g, "&#39;")})'>
+
+      <div class="song-image">
+        <img src="${song.songImageUrl || "placeholder.jpg"}"
+             alt="${escapeHtml(songTitle(song))}" />
+
+        <div class="play-overlay">
+          <i class="fas fa-play"></i>
+        </div>
+      </div>
+
+      <div class="song-info">
+        <h4>${escapeHtml(songTitle(song))}</h4>
+        <p>${escapeHtml(songSinger(song))}</p>
+        <p>${escapeHtml(songAlbum(song))}</p>
+      </div>
+    </div>
+  `;
+    }
+// Simple HTML escaping to prevent XSS in song details
+    function playSong(song) {
+      currentSong = song;
+      document.getElementById("currentSongTitle").textContent = songTitle(song);
+      document.getElementById("currentSongArtist").textContent = songSinger(song);
+      isPlaying = true;
+      document.getElementById("playPauseBtn").innerHTML = '<i class="fas fa-pause"></i>';
+    }
+// Toggle play/pause state and update button icon
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      document.getElementById("playPauseBtn").innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+    }
+
+    let adminSongsCache = [];
+
+    async function loadDashboardData() {
+      try {
+        adminSongsCache = await getAllSongsAdmin();
+        renderAdminDashboard(adminSongsCache);
+      } catch (e) {
+        console.error(e);
+        renderAdminDashboard([]);
+      }
+    }
+// Render dashboard stats and recent songs, with fallback for no songs
+    function renderAdminDashboard(songs) {
+      document.getElementById("adminSongs").textContent = songs.length;
+      const visible = songs.filter(songVisible).length;
+      document.getElementById("visibleSongs").textContent = visible;
+      document.getElementById("hiddenSongs").textContent = songs.length - visible;
+      document.getElementById("adminRecentSongs").innerHTML =
+        songs.slice(0, 8).map(songCard).join("") ||
+        '<div class="empty-state"><i class="fas fa-music"></i><h3>No songs added</h3><p>Create songs from admin songs page.</p></div>';
+    }
+// Search function that filters songs based on title, singer, album, and music director
+    function searchDashboard(q) {
+      const s = q.toLowerCase();
+      const filtered = !s ? adminSongsCache : adminSongsCache.filter((song) =>
+        `${songTitle(song)} ${songSinger(song)} ${songAlbum(song)} ${song.musicDirector || ""}`.toLowerCase().includes(s)
+      );
+      renderAdminDashboard(filtered);
+    }
+    
+  </script>
+</body>
+
+</html>
