@@ -1,0 +1,60 @@
+package com.wipro;
+
+import java.util.Properties;
+
+import javax.sql.DataSource;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+
+
+@Configuration
+@EnableTransactionManagement
+@ComponentScan("com.wipro")
+public class MyConfig {
+	@Bean
+	public DataSource dataSource() {
+		DriverManagerDataSource dataSource = new DriverManagerDataSource();   // db object for connection
+		dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver"); // db driver for sql jar file
+		dataSource.setUrl("jdbc:mysql://localhost:3306/hibernate"); // url of db table
+		dataSource.setUsername("root");
+		dataSource.setPassword("root");
+		return dataSource;
+	}
+
+	@Bean
+	public LocalSessionFactoryBean sessionFactory() {
+		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();  
+		sessionFactory.setDataSource((javax.sql.DataSource) dataSource()); // 1. set the data source
+		sessionFactory.setPackagesToScan("com.wipro"); // 2. scan all required components
+		sessionFactory.setHibernateProperties(hibernateProperties()); // 3. hibernate properties
+		return sessionFactory;
+	}
+
+	private Properties hibernateProperties() {
+
+		Properties propobj = new Properties();
+		propobj.put("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect"); // which db using
+		propobj.put("hibernate.show_sql", "false");    // shows all the sql queries peforming background by ORM
+		propobj.put("hibernate.hbm2ddl.auto", "update");
+		return propobj;
+	}
+	
+	
+	// transcations are created within the session
+	@Bean
+	public HibernateTransactionManager transactionManager() {
+		HibernateTransactionManager txManager = new HibernateTransactionManager();  // opens a transaction and execute it
+		txManager.setSessionFactory(sessionFactory().getObject());   // to perform transaction it requires a session factory obj
+		return txManager;
+	}
+
+	
+	
+}
