@@ -1,0 +1,16 @@
+{
+  "name": "internmanagemnet",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "internManager.js",
+  "scripts": {
+  "test": "jest"
+},
+  "keywords": [],
+  "devDependencies": {
+    "jest": "^30.4.2"
+  }
+}
