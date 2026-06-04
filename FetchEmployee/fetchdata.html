@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Random User Fetch</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    h2 {
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #fff;
+      color: #333;
+      font-weight: bold;
+      border-radius: 25px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #333;
+      color: #fff;
+    }
+
+    .card {
+      width: 320px;
+      border: none;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease;
+      margin: 30px auto;
+      background: rgba(0, 213, 255, 0.41);
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+    }
+
+    .card img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin: 20px auto 10px;
+      border: 4px solid #fff;
+      object-fit: cover;
+    }
+
+    .card-body {
+      text-align:start;
+      padding: 10%;
+
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: bold;
+      margin-top: 10px;
+      color: #ffffff;
+    }
+
+    .card-text {
+      color: #ffffff;
+      font-size: 0.9rem;
+    }
+     #output {
+      color: #fff;
+      margin-top: 20px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <h2>Fetching Some Random User Profile</h2>
+  <button onclick="runFetchAPI()">Fetch Employees (Console)</button>
+  <button onclick="getRandomUser()">Fetch User Profile</button>
+   <div id="output"></div>
+  <div id="user-info"></div>
+
+  <script>
+    function runFetchAPI() {
+      fetch("https://dummy.restapiexample.com/api/v1/employees")
+        .then(response => {
+          return response.json();
+        })
+        .then(data => {
+          console.log("Full Response:", data);
+          console.log("Employee List:", data.data);
+          document.getElementById('output').innerHTML = '<h2>Check Console tab in the browser for employees!</h2>';
+        })
+        .catch(error => console.error("Error:", error));
+    }
+    function getRandomUser() {
+      fetch("https://randomuser.me/api/")
+        .then((response) => response.json())
+        .then((data) => {
+          console.log("Random User Data:", data);
+          const user = data.results[0];
+          
+          document.getElementById("user-info").innerHTML = `
+           <div class="card">
+             <img src="${user.picture.large}" alt="User Picture">
+             <div class="card-body">
+               <h5 class="card-title"> ${user.name.title} ${user.name.first} ${user.name.last}</h5>
+               <p class="card-text">Email : ${user.email}</p>
+               <p class="card-text">Age : ${user.dob.age}</p>
+               <p class="card-text">Location : ${user.location.city}, ${user.location.country}</p>
+               <p class="card-text">Phone : ${user.phone}</p>
+
+             </div>
+           </div>
+           `;
+        })
+        .catch((error) => {
+          console.error("Error fetching user:", error);
+        });
+    }
+  </script>
+</body>
+
+</html>
